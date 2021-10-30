@@ -1,2 +1,2 @@
 # go-customtypes
-Custom types. Mostly useful for json/yaml (un)marshalling
+Custom types. Mostly useful for json/yaml (un)marshal
