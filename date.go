@@ -14,7 +14,7 @@ var dateLayouts = []string{
 	"2006-01-02T15:04Z07:00",
 }
 
-// UnmarshalText unmarshals yaml into a regexp.Date
+// UnmarshalText unmarshals text into a Date
 func (d *Date) UnmarshalText(b []byte) (err error) {
 	s := strings.Trim(string(b), `"`)
 	var nt time.Time
@@ -27,12 +27,12 @@ func (d *Date) UnmarshalText(b []byte) (err error) {
 	return
 }
 
-// MarshalText marshals regexp.Date as string
+// MarshalText marshals Date as string
 func (d *Date) MarshalText() ([]byte, error) {
 	return []byte(d.String()), nil
 }
 
-// String returns the time in the custom format
+// String returns the Date in the custom format
 func (d *Date) String() string {
 	t := time.Time(*d)
 	return fmt.Sprintf("%q", t.Format(dateLayouts[0]))
