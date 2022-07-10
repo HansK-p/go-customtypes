@@ -56,3 +56,11 @@ func (ss *SmartString) MarshalText() (value []byte, err error) {
 func (ss *SmartString) String(objs ...interface{}) (string, error) {
 	return ss.inner.String(objs...)
 }
+
+func (ss *SmartString) MustString(objs ...interface{}) string {
+	if result, err := ss.inner.String(objs...); err != nil {
+		panic(err)
+	} else {
+		return result
+	}
+}
