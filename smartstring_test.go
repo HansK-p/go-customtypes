@@ -23,6 +23,11 @@ func TestSmartStrings(t *testing.T) {
 	testSets := []TestSet{
 		{value: `hello world`, expect: `hello world`},
 		{value: `txt:hello worlds`, expect: `hello worlds`},
+		{value: `""`, renderShouldError: true},
+		{value: `"txt:"`, renderShouldError: true},
+		{value: `":"`, expect: `:`},
+		{value: `""`, expect: ``, properties: &SmartStringProperties{}},
+		{value: `""`, expect: `hello world`, properties: &SmartStringProperties{String: "hello world"}},
 		{value: `tpl:hello {{.Obj.Color}} world`, expect: `hello blue world`, properties: &SmartStringProperties{Obj: struct{ Color string }{Color: "blue"}}},
 		{value: `tpl:hello {{.Obj.Color}} world`, renderShouldError: true, properties: &SmartStringProperties{Obj: struct{ Form string }{Form: "rectangle"}}},
 		{value: `sed:s/^(.+)\.([^.]+)$/${2}_${1}/`, expect: `hello_world`, properties: &SmartStringProperties{String: "world.hello"}},

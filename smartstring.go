@@ -24,7 +24,7 @@ type SmartStringProperties struct {
 func (ss *SmartString) UnmarshalText(b []byte) (err error) {
 	kind, value := "", b
 	idx := bytes.Index(b, []byte(":"))
-	if idx >= 0 {
+	if idx > 0 {
 		kind = string(b[:idx])
 		value = b[idx+1:]
 	}
