@@ -1,44 +1,58 @@
 package customtypes
 
 import (
+	"fmt"
 	"testing"
 
 	"gopkg.in/yaml.v2"
 )
 
-type SStrings struct {
-	Txt0 SmartString
-	Txt1 SmartString
-	Tpl0 SmartString
+type Parsed struct {
+	Txt SmartString
+}
+
+type TestSet struct {
+	value             string
+	expect            string
+	input             []interface{}
+	parseShouldError  bool
+	renderShouldError bool
 }
 
 func TestSmartStrings(t *testing.T) {
-	yamlSmartStrings := `---
-txt0: hello world
-txt1: txt:hello worlds
-tpl0: tpl:hello {{.Color}} world
-`
-	t.Log("Parsing the yaml file")
-	sStrings := SStrings{}
-	if err := yaml.Unmarshal([]byte(yamlSmartStrings), &sStrings); err != nil {
-		t.Fatalf("Unable to unmarshal yaml data into smart strings: %s", err)
+	testSets := []TestSet{
+		{value: `hello world`, expect: `hello world`},
+		{value: `txt:hello worlds`, expect: `hello worlds`},
+		{value: `tpl:hello {{.Color}} world`, expect: `hello blue world`, input: []interface{}{struct{ Color string }{Color: "blue"}}},
+		{value: `tpl:hello {{.Color}} world`, renderShouldError: true},
+		{value: `sed:s/^(.+)\.([^.]+)$/${2}_${1}/`, expect: `hello_world`, input: []interface{}{"world.hello"}},
+		{value: `sed:s/^((.+)\.([^.]+)$/${2}_${1}/`, parseShouldError: true},
+		{value: `sedtpl:s/^(.+)\.([^.]+)$/${2}_{{.Color}}_${1}/`, parseShouldError: true, input: []interface{}{"world.hello", struct{ Color string }{Color: "blue"}}},
+		{value: `awk:hello world`, parseShouldError: true},
 	}
-	txt0 := "hello world"
-	txt1 := "hello worlds"
-	tpl0 := "hello blue world"
-	if txt, err := sStrings.Txt0.String(); err != nil {
-		t.Errorf("Got error when getting string value of txt0: %s", err)
-	} else if txt != txt0 {
-		t.Errorf("Result from parsing Json value txt0 is '%s', which differs from the expected value '%s'", txt, txt0)
-	}
-	if txt, err := sStrings.Txt1.String(); err != nil {
-		t.Errorf("Got error when getting string value of txt1: %s", err)
-	} else if txt != txt1 {
-		t.Errorf("Result from parsing Json value txt1 is '%s', which differs from the expected value '%s'", txt, txt1)
-	}
-	if txt, err := sStrings.Tpl0.String(struct{ Color string }{Color: "blue"}); err != nil {
-		t.Errorf("Got error when getting string value of tpl0: %s", err)
-	} else if txt != tpl0 {
-		t.Errorf("Result from parsing Json value tpl0 is '%s', which differs from the expected value '%s'", txt, tpl0)
+	for _, testSet := range testSets {
+		yamlText := fmt.Sprintf("---\ntxt: %s", testSet.value)
+		t.Logf("Parsing the yaml file based on value '%s'", testSet.value)
+		parsed := Parsed{}
+		if err := yaml.Unmarshal([]byte(yamlText), &parsed); err != nil {
+			if !testSet.parseShouldError {
+				t.Errorf("Unable to unmarshal yaml data '%s' as a smart string: %s", yamlText, err)
+			}
+			continue
+		}
+		if testSet.parseShouldError {
+			t.Errorf("Parsing the yaml '%s' should have failed, but didn't", yamlText)
+			continue
+		}
+		if txt, err := parsed.Txt.String(testSet.input...); err != nil {
+			if !testSet.renderShouldError {
+				t.Errorf("Got error when parsing '%s': %s", testSet.input, err)
+			}
+			continue
+		} else if txt != testSet.expect {
+			t.Errorf("Result from rendering the result set is '%s', which differs from the expected value '%s'", txt, testSet.expect)
+		} else {
+			t.Logf("Parsed into the expected text: %s", txt)
+		}
 	}
 }

@@ -29,6 +29,8 @@ func (ss *SmartString) UnmarshalText(b []byte) (err error) {
 		inner = &smartStringTxt{}
 	case "txt":
 		inner = &smartStringTxt{}
+	case "sed":
+		inner = &smartStringSed{}
 	case "tpl":
 		inner = &smartStringTpl{}
 	default:
