@@ -26,12 +26,8 @@ func (sst *smartStringTpl) MarshalText() (value []byte, err error) {
 	return sst.b, nil
 }
 
-func (sst *smartStringTpl) String(objs ...interface{}) (result string, err error) {
+func (sst *smartStringTpl) String(properties *SmartStringProperties) (result string, err error) {
 	body := bytes.Buffer{}
-	if len(objs) == 1 {
-		err = sst.tpl.Execute(&body, objs[0])
-	} else {
-		err = sst.tpl.Execute(&body, objs)
-	}
+	err = sst.tpl.Execute(&body, properties)
 	return body.String(), err
 }

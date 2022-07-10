@@ -13,6 +13,6 @@ func (sst *smartStringTxt) MarshalText() (value []byte, err error) {
 	return sst.b, nil
 }
 
-func (sst *smartStringTxt) String(objs ...interface{}) (string, error) {
+func (sst *smartStringTxt) String(properties *SmartStringProperties) (string, error) {
 	return string(sst.b), nil
 }

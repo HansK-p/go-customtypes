@@ -1,7 +1,6 @@
 package customtypes
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/rwtodd/Go.Sed/sed"
@@ -28,15 +27,8 @@ func (sss *smartStringSed) MarshalText() (value []byte, err error) {
 	return sss.b, nil
 }
 
-func (sss *smartStringSed) String(objs ...interface{}) (result string, err error) {
-	if len(objs) != 1 {
-		return "", fmt.Errorf("there must be exactly one string argument")
-	}
-	switch x := (objs[0]).(type) {
-	case string:
-		result, err = sss.engine.RunString(x)
-		result = strings.TrimSuffix(result, "\n")
-		return
-	}
-	return "", fmt.Errorf("there must be exactly one string argument - argument type received was %X", objs[0])
+func (sss *smartStringSed) String(properties *SmartStringProperties) (result string, err error) {
+	result, err = sss.engine.RunString(properties.String)
+	result = strings.TrimSuffix(result, "\n")
+	return
 }

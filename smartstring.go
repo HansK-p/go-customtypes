@@ -8,12 +8,17 @@ import (
 type smartString interface {
 	UnmarshalText(b []byte) (err error)
 	MarshalText() ([]byte, error)
-	String(objs ...interface{}) (string, error)
+	String(properties *SmartStringProperties) (string, error)
 }
 
 type SmartString struct {
 	kind  string
 	inner smartString
+}
+
+type SmartStringProperties struct {
+	String string
+	Obj    interface{}
 }
 
 func (ss *SmartString) UnmarshalText(b []byte) (err error) {
@@ -53,12 +58,12 @@ func (ss *SmartString) MarshalText() (value []byte, err error) {
 	return
 }
 
-func (ss *SmartString) String(objs ...interface{}) (string, error) {
-	return ss.inner.String(objs...)
+func (ss *SmartString) String(properties *SmartStringProperties) (string, error) {
+	return ss.inner.String(properties)
 }
 
-func (ss *SmartString) MustString(objs ...interface{}) string {
-	if result, err := ss.inner.String(objs...); err != nil {
+func (ss *SmartString) MustString(properties *SmartStringProperties) string {
+	if result, err := ss.inner.String(properties); err != nil {
 		panic(err)
 	} else {
 		return result
