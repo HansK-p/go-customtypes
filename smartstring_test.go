@@ -21,22 +21,24 @@ type TestSet struct {
 
 func TestSmartStrings(t *testing.T) {
 	testSets := []TestSet{
-		{value: `hello world`, expect: `hello world`},
-		{value: `txt:hello worlds`, expect: `hello worlds`},
-		{value: `""`, renderShouldError: true},
-		{value: `"txt:"`, renderShouldError: true},
-		{value: `":"`, expect: `:`},
-		{value: `""`, expect: ``, properties: &SmartStringProperties{}},
-		{value: `""`, expect: `hello world`, properties: &SmartStringProperties{String: "hello world"}},
-		{value: `tpl:hello {{.Obj.Color}} world`, expect: `hello blue world`, properties: &SmartStringProperties{Obj: struct{ Color string }{Color: "blue"}}},
-		{value: `tpl:hello {{.Obj.Color}} world`, renderShouldError: true, properties: &SmartStringProperties{Obj: struct{ Form string }{Form: "rectangle"}}},
-		{value: `sed:s/^(.+)\.([^.]+)$/${2}_${1}/`, expect: `hello_world`, properties: &SmartStringProperties{String: "world.hello"}},
-		{value: `sed:s/^((.+)\.([^.]+)$/${2}_${1}/`, parseShouldError: true},
-		{value: `sedtpl:s/^(.+)\.([^.]+)$/${2}_{{.Color}}_${1}/`, parseShouldError: true},
-		{value: `awk:hello world`, parseShouldError: true},
+		{value: `txt: hello world`, expect: `hello world`},
+		{value: `txt: txt:hello worlds`, expect: `hello worlds`},
+		{value: `txt: ""`, renderShouldError: true},
+		{value: `txt: "txt:"`, renderShouldError: true},
+		{value: `txt: ":"`, expect: `:`},
+		{value: `txt: ""`, expect: ``, properties: &SmartStringProperties{}},
+		{value: `txt: ""`, expect: `hello world`, properties: &SmartStringProperties{String: "hello world"}},
+		{value: `txt: tpl:hello {{.Obj.Color}} world`, expect: `hello blue world`, properties: &SmartStringProperties{Obj: struct{ Color string }{Color: "blue"}}},
+		{value: `txt: tpl:hello {{.Obj.Color}} world`, renderShouldError: true, properties: &SmartStringProperties{Obj: struct{ Form string }{Form: "rectangle"}}},
+		{value: `txt: sed:s/^(.+)\.([^.]+)$/${2}_${1}/`, expect: `hello_world`, properties: &SmartStringProperties{String: "world.hello"}},
+		{value: `txt: sed:s/^((.+)\.([^.]+)$/${2}_${1}/`, parseShouldError: true},
+		{value: `txt: sedtpl:s/^(.+)\.([^.]+)$/${2}_{{.Color}}_${1}/`, parseShouldError: true},
+		{value: `txt: awk:hello world`, parseShouldError: true},
+		{value: `foo: bar`, renderShouldError: true},
+		{value: `foo: bar`, expect: `hello world`, properties: &SmartStringProperties{String: "hello world"}},
 	}
 	for _, testSet := range testSets {
-		yamlText := fmt.Sprintf("---\ntxt: %s", testSet.value)
+		yamlText := fmt.Sprintf("---\n%s", testSet.value)
 		t.Logf("Parsing the yaml file based on value '%s'", testSet.value)
 		parsed := Parsed{}
 		if err := yaml.Unmarshal([]byte(yamlText), &parsed); err != nil {

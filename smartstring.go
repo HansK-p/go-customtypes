@@ -59,11 +59,16 @@ func (ss *SmartString) MarshalText() (value []byte, err error) {
 }
 
 func (ss *SmartString) String(properties *SmartStringProperties) (string, error) {
+	if ss.inner == nil { // Object not initialized - initialize the object as a text smartstring (default when nothing is unmarshaled)
+		if err := ss.UnmarshalText(nil); err != nil {
+			panic(err) // This should never happen
+		}
+	}
 	return ss.inner.String(properties)
 }
 
 func (ss *SmartString) MustString(properties *SmartStringProperties) string {
-	if result, err := ss.inner.String(properties); err != nil {
+	if result, err := ss.String(properties); err != nil {
 		panic(err)
 	} else {
 		return result
