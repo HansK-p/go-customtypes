@@ -12,6 +12,7 @@ type Dates struct {
 	Custom_1 Date
 	Custom_2 Date
 	Custom_3 Date
+	Custom_4 Date
 }
 
 func TestDate(t *testing.T) {
@@ -20,6 +21,7 @@ rfc3339: "2021-12-13T23:00:05Z"
 custom_1: "2021-12-13T23:00Z"
 custom_2: "2021-12-13T23:00:07"
 custom_3: "2021-12-13"
+custom_4: "2023-09-18T00:00:00"
 `
 	t.Log("Parsing the yaml file")
 	dates := Dates{}
@@ -30,6 +32,7 @@ custom_3: "2021-12-13"
 	custom_1 := time.Time(dates.Custom_1)
 	custom_2 := time.Time(dates.Custom_2)
 	custom_3 := time.Time(dates.Custom_3)
+	custom_4 := time.Time(dates.Custom_4)
 
 	if rfc3339.Sub(custom_1).Seconds() != 5 {
 		t.Errorf("There isn't 5 seconds difference as expected between dates, %s - %s = %f", rfc3339, custom_1, rfc3339.Sub(custom_1).Seconds())
@@ -40,4 +43,5 @@ custom_3: "2021-12-13"
 	if custom_1.Sub(custom_3).Seconds() != 3600*23 {
 		t.Errorf("There isn't 3600*23 seconds difference as expected between dates, %s - %s = %f", custom_1, custom_3, custom_1.Sub(custom_3).Seconds())
 	}
+	t.Errorf("Custom 4: %v", custom_4)
 }

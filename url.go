@@ -1,6 +1,7 @@
 package customtypes
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 )
@@ -12,7 +13,7 @@ func (u *Url) UnmarshalText(b []byte) (err error) {
 	s := strings.Trim(string(b), `"`)
 	var nu *url.URL
 	if nu, err = url.Parse(s); err != nil {
-		return err
+		return fmt.Errorf("when parsing the string '%s' as an URL: %w", s, err)
 	}
 	*u = Url(*nu)
 	return
