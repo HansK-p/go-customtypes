@@ -12,6 +12,7 @@ type Date time.Time
 var dateLayouts = []string{
 	time.RFC3339,
 	"2006-01-02T15:04Z07:00",
+	"2006-01-02T15:04:05",
 	"2006-01-02",
 }
 
